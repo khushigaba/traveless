@@ -1,0 +1,350 @@
+﻿@page "/Reservations"
+@using Traveless.Data
+
+<head>
+    <title>Reservation Finder</title>
+</head>
+<body>
+    <div class="container">
+        <h3>Reservation Finder</h3>
+        <form>
+            <div class="flex">
+                <div>
+                    <label for="code">Code:</label>
+                    <select @onchange="GetRCode">
+                        <option disabled selected>Select a Reservation Code</option>
+                        @foreach (var item in reservationList)
+                        {
+                            <option value="@item.ReservationCode">@item.ReservationCode</option>
+                        }
+                    </select>
+                </div>
+                <div>
+                    <label for="airline">Airline:</label>
+                    <select @onchange="GetRAirlines">
+                        <option disabled selected>Select an Airline</option>
+                        @foreach (var item in reservationList)
+                        {
+                            <option value="@item.Flight.AirlineName">@item.Flight.AirlineName</option>
+                        }
+                    </select>
+                </div>
+                <div>
+                    <label for="name">Name:</label>
+                    <select @onchange="GetRName">
+                        <option disabled selected>Select a Name</option>
+                        @foreach (var item in reservationList)
+                        {
+                            <option value="@item.Name">@item.Name</option>
+                        }
+                    </select>
+                </div>
+                <div>
+                    <br /><Button Style="width:275px; margin-left:7.5px; height: 35px;" @onclick="FindReservation" Color="Color.Primary"> Find Reservations</Button>
+                </div>
+            </div>
+        </form>
+
+        <h3>Reservations</h3>
+        @if (findReservations.Count == 0)
+        {
+            <div class="reservations">
+                <input type="text" id="reservation" name="reservation" placeholder="Loading...">
+            </div>
+        }
+        else
+        {
+            <ListGroup Mode="ListGroupMode.Selectable" @bind-SelectedItem="selectedItem">
+                @foreach (var item in findReservations)
+                {
+                    <ListGroupItem Name="@item.ReservationCode">@item</ListGroupItem>
+                    ;
+                }
+            </ListGroup>
+        }
+        <br />
+        <h3>Reserve</h3>
+        <form>
+            <label for="flight_code">Reservation Code:</label>
+            @if (selectedItem == "")
+            {
+                <div class="reserveflights">
+                    <div>Reservation Code</div>
+                </div>
+            }
+            else
+            {
+                <div class="reservedflights">
+                    <div>
+                        @foreach (var item in findReservations)
+                        {
+                            if (selectedItem == item.ReservationCode)
+                            {
+                                @item.ReservationCode
+                            }
+                        }
+                    </div>
+                </div>
+            }
+
+            <br />
+
+            <label for="flight_code">Flight Code:</label>
+            @if (selectedItem == "")
+            {
+                <div class="reserveflights">
+                    <div>Flight Code</div>
+                </div>
+            }
+            else
+            {
+                <div class="reservedflights">
+                    <div>
+                        @foreach (var item in findReservations)
+                        {
+                            if (selectedItem == item.ReservationCode)
+                            {
+                                @item.Flight.FlightCode
+                            }
+                        }
+                    </div>
+                </div>
+            }
+            <br />
+
+            <label for="day">Airline:</label>
+            @if (selectedItem == "")
+            {
+                <div class="reserveflights">
+                    <div>Airline</div>
+                </div>
+            }
+            else
+            {
+                <div class="reservedflights">
+                    <div>
+                        @foreach (var item in findReservations)
+                        {
+                            if (selectedItem == item.ReservationCode)
+                            {
+                                @item.Flight.AirlineName
+                            }
+                        }
+                    </div>
+                </div>
+            }
+            <br />
+            <label for="cost">Cost:</label>
+            @if (selectedItem == "")
+            {
+                <div class="reserveflights">
+                    <div>Cost</div>
+                </div>
+            }
+            else
+            {
+                <div class="reservedflights">
+                    <div>
+                        @foreach (var item in findReservations)
+                        {
+                            if (selectedItem == item.ReservationCode)
+                            {
+                                @item.Flight.Price
+                            }
+                        }
+                    </div>
+                </div>
+            }
+
+            <br />
+
+            <label for="name">Name:</label>
+            @if (selectedItem == "")
+            {
+                <div class="reserveflights">
+                    <div>Name</div>
+                </div>
+            }
+            else
+            {
+                <div class="editreservation">
+                    <div>
+                        @foreach (var item in findReservations)
+                        {
+                            if (selectedItem == item.ReservationCode)
+                            {
+                                <input type="text" id="name" @bind="updatedName = item.Name" placeholder="Name">
+                            }
+                        }
+                    </div>
+                </div>
+            }
+
+            <br/>
+
+            <label for="citizenship">Citizenship:</label>
+            @if (selectedItem == "")
+            {
+                <div class="reserveflights">
+                    <div>Citizenship</div>
+                </div>
+            }
+            else
+            {
+                <div class="editreservation">
+                    <div>
+                        @foreach (var item in findReservations)
+                        {
+                            if (selectedItem == item.ReservationCode)
+                            {
+                                <input type="text" id="citizenship" @bind="updatedCitizenship = item.Citizenship" placeholder="Citizenship">
+                            }
+                        }
+                    </div>
+                </div>
+            }
+
+            <br />
+            <label for="status">Status:</label>
+            @if (selectedItem == "")
+            {
+                <div class="reserveflights">
+                    <div>Status</div>
+                </div>
+            }
+            else
+            {
+                <div class="editreservation">
+                    <div>
+                        @foreach (var item in findReservations)
+                        {
+                            if (selectedItem == item.ReservationCode)
+                            {
+                                <select @bind="updatedStatus = item.Status">
+                                    <option value="Active">Active</option>
+                                    <option value="Inactive">Inactive</option>
+                                </select>
+                            }
+                        }
+                    </div>
+                </div>
+            }
+            <br />
+
+            <div class="rbutton">
+                <br/>
+                <p><b> @errormsg </b></p>
+                <Button Style="width:275px; margin-left:7.5px; height: 35px;" @onclick="UpdateReservation" Color="Color.Primary">Save</Button>
+            </div>
+        </form>
+    </div>
+</body>
+
+@code {
+
+    ReservationManager rm = new ReservationManager();
+    List<Reservation> reservationList = ReservationManager.GetReservations();
+    List<Reservation> findReservations = new List<Reservation>();
+    string RCode;
+    string RAirlines;
+    string RName;
+    string updatedName;
+    string updatedCitizenship;
+    string updatedStatus;
+    string selectedItem = "";
+    string errormsg;
+
+    void GetRCode(ChangeEventArgs e)
+    {
+        RCode = e.Value.ToString();
+    }
+
+    void GetRAirlines(ChangeEventArgs e)
+    {
+        RAirlines = e.Value.ToString();
+    }
+    void GetRName(ChangeEventArgs e)
+    {
+        RName = e.Value.ToString();
+    }
+
+    void updateName(ChangeEventArgs e, Reservation item)
+    {
+        item.Name = e.Value.ToString();
+    }
+
+    void updateCitizenship(ChangeEventArgs e, Reservation item)
+    {
+        item.Citizenship = e.Value.ToString();
+    }
+
+    void updateStatus(ChangeEventArgs e, Reservation item)
+    {
+        item.Status = e.Value.ToString();
+    }
+    void ValidateInputs()
+    {
+        if (string.IsNullOrWhiteSpace(updatedName))
+        {
+            throw new InvalidNameException();
+        }
+
+        if (string.IsNullOrWhiteSpace(updatedCitizenship))
+        {
+            throw new InvalidCitizenshipException();
+        }
+    }
+
+    void FindReservation()
+    {
+        errormsg = "";
+        selectedItem = "";
+        findReservations.Clear();
+        foreach (var item in reservationList)
+        {
+
+            if (item.ReservationCode == RCode || item.Flight.AirlineName == RAirlines || item.Name == RName)
+            {
+                findReservations.Add(item);
+            }
+        }
+    }
+
+    void UpdateReservation()
+    {
+        errormsg = "";
+        try
+        {
+            ValidateInputs();
+            foreach (var item in reservationList)
+            {
+                if(selectedItem == "")
+                {
+                    throw new NoFlightSelectedException();
+                }
+                else
+                {
+                    if (selectedItem == item.ReservationCode)
+                    {
+                        ReservationManager.updateReservation(selectedItem, item.Name, item.Citizenship, item.Status);
+                    }
+                }
+            }
+
+        }
+
+        catch(NoFlightSelectedException e)
+        {
+            errormsg = e.Message;
+        }
+        catch (InvalidNameException e)
+        {
+            errormsg = e.Message;
+        }
+        catch (InvalidCitizenshipException e)
+        {
+            errormsg = e.Message;
+        }
+
+        }
+}

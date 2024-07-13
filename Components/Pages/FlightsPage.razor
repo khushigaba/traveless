@@ -1,0 +1,353 @@
+﻿@page "/FlightsPage"
+@using Traveless.Data
+
+<head>
+    <title>Flight Finder</title>
+</head>
+<body>
+    <div class="container">
+        <h3>Flight Finder</h3>
+        <form>
+            <div class="flex">
+                <div>
+                    <!-- Dropdown for selecting origin airport -->
+                    <label for="from">From:</label>
+                    <select @onchange="orgAirport">
+                        <option disabled selected>Select an Airport</option>
+                        @foreach (var item in airportList)
+                        {
+                            <option value="@item.AirportCode">@item.AirportName</option>
+                        }
+                    </select>
+                </div>
+                <div>
+                    <!-- Dropdown for selecting destination airport -->
+                    <label for="to">To:</label>
+                    <select @onchange="destAirport">
+                        <option disabled selected>Select an Airport</option>
+                        @foreach (var item in airportList)
+                        {
+                            <option value="@item.AirportCode">@item.AirportName</option>
+                        }
+                    </select>
+                </div>
+                <div>
+                    <!-- Dropdown for selecting day of the week -->
+                    <label for="day">Day:</label>
+                    <select @onchange="dayOfWeek">
+                        <option disabled selected>Select a Day</option>
+                        <option value="Monday">Monday</option>
+                        <option value="Tuesday">Tuesday</option>
+                        <option value="Wednesday">Wednesday</option>
+                        <option value="Thursday">Thursday</option>
+                        <option value="Friday">Friday</option>
+                        <option value="Saturday">Saturday</option>
+                        <option value="Sunday">Sunday</option>
+                    </select>
+                </div>
+                <div class="findButton">
+                    <!-- Button to find flights based on selected criteria -->
+                    <br /><Button Style="width:275px; margin-left:7.5px; height: 35px;" @onclick="FindFlight" Color="Color.Primary"> Find flights </Button>
+                </div>
+            </div>
+        </form>
+
+        <h3>Flights</h3>
+
+        @if (findFlights.Count == 0)
+        {
+            <!-- Display loading text if no flights found -->
+            <div class="flights">
+                <input type="text" id="flights" name="from" placeholder="Loading">
+            </div>
+        }
+        else
+        {
+            <!-- Display list of found flights -->
+            <ListGroup Mode="ListGroupMode.Selectable" @bind-SelectedItem="selectedItem">
+                @foreach (var item in findFlights)
+                {
+                    <ListGroupItem Name="@item.FlightCode">@item</ListGroupItem>
+                }
+            </ListGroup>
+        }
+
+        <br /><br /><h3>Reserve</h3>
+        <form>
+            <label for="flight_code">Flight code:</label>
+            @if (selectedItem == "")
+            {
+                <!-- Display placeholder text if no flight is selected -->
+                <div class="reserveflights">
+                    <div>Flight</div>
+                </div>
+            }
+            else
+            {
+                <!-- Display selected flight code -->
+                <div class="reservedflights">
+                    <div>@selectedItem</div>
+                </div>
+            }
+
+            <br />
+
+            <label for="airline">Airline:</label>
+            @if (selectedItem == "")
+            {
+                <!-- Display placeholder text if no flight is selected -->
+                <div class="reserveflights">
+                    <div>Airline</div>
+                </div>
+            }
+            else
+            {
+                <!-- Display airline of selected flight -->
+                <div class="reservedflights">
+                    <div>
+                        @foreach (var item in findFlights)
+                        {
+                            if (selectedItem == item.FlightCode)
+                            {
+                                @item.AirlineName
+                            }
+                        }
+                    </div>
+                </div>
+            }
+
+            <br />
+
+            <label for="day">Day:</label>
+            @if (selectedItem == "")
+            {
+                <!-- Display placeholder text if no flight is selected -->
+                <div class="reserveflights">
+                    <div>Day</div>
+                </div>
+            }
+            else
+            {
+                <!-- Display day of selected flight -->
+                <div class="reservedflights">
+                    <div>
+                        @foreach (var item in findFlights)
+                        {
+                            if (selectedItem == item.FlightCode)
+                            {
+                                @item.Day
+                            }
+                        }
+                    </div>
+                </div>
+            }
+
+            <br />
+
+            <label for="time">Time:</label>
+
+            @if (selectedItem == "")
+            {
+                <!-- Display placeholder text if no flight is selected -->
+                <div class="reserveflights">
+                    <div>time</div>
+                </div>
+            }
+            else
+            {
+                <!-- Display time of selected flight -->
+                <div class="reservedflights">
+                    <div>
+                        @foreach (var item in findFlights)
+                        {
+                            if (selectedItem == item.FlightCode)
+                            {
+                                @item.Time
+                            }
+                        }
+                    </div>
+                </div>
+            }
+
+            <br />
+
+            <label for="cost">Cost:</label>
+            @if (selectedItem == "")
+            {
+                <!-- Display placeholder text if no flight is selected -->
+                <div class="reserveflights">
+                    <div>cost</div>
+                </div>
+            }
+            else
+            {
+                <!-- Display cost of selected flight -->
+                <div class="reservedflights">
+                    <div>
+                        @foreach (var item in findFlights)
+                        {
+                            if (selectedItem == item.FlightCode)
+                            {
+                                @item.Price
+                            }
+                        }
+                    </div>
+                </div>
+            }
+
+            <br />
+
+            <label for="name">Name:</label>
+            <!-- Input field for user to enter their name -->
+            <input @bind="name" type="text" id="name" name="name" placeholder="Name"><br /><br />
+
+            <label for="citizenship">Citizenship:</label>
+            <!-- Input field for user to enter their citizenship -->
+            <input @bind="citizenship" type="text" id="citizenship" name="citizenship" placeholder="Citizenship"><br />
+            <div class="rbutton">
+                <p><b>@errormsg</b></p>
+                <!-- Button to reserve the selected flight -->
+                <Button Style="width:275px; margin-left:7.5px; height: 35px;" @onclick="Rcode" Color="Color.Primary">Reserve </Button>
+                <p>Reservation Code: @reservationCode</p>
+
+            </div>
+        </form>
+    </div>
+</body>
+
+@code {
+    // Initializing AirportManager and FlightManager to manage airports and flights
+    AirportManager am = new AirportManager();
+    List<Airports> airportList = AirportManager.GetAirports();
+    FlightManager fm = new FlightManager();
+    List<Flights> flightList = FlightManager.GetFlights();
+    List<Flights> findFlights = new List<Flights>();
+
+    string destination;
+    string origin;
+    string day;
+    string selectedItem = "";
+    string reservationCode;
+    string citizenship;
+    string name;
+    string errormsg;
+
+    // Method to set origin airport
+    void orgAirport(ChangeEventArgs e)
+    {
+        origin = e.Value.ToString();
+    }
+    // Method to set destination airport
+    void destAirport(ChangeEventArgs e)
+    {
+        destination = e.Value.ToString();
+    }
+    // Method to set day of the week
+    void dayOfWeek(ChangeEventArgs e)
+    {
+        day = e.Value.ToString();
+    }
+    // Method to find flights based on origin, destination, and day
+    void FindFlight()
+    {
+        name = "";
+        citizenship = "";
+        errormsg = "";
+        selectedItem = "";
+
+        findFlights.Clear();
+        foreach (var item in flightList)
+        {
+            if (item.Origin == origin && item.Destination == destination && item.Day == day)
+            {
+                findFlights.Add(item);
+            }
+        }
+    }
+
+    // Method to validate user inputs
+    void ValidateInputs()
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new InvalidNameException();
+        }
+
+        if (string.IsNullOrWhiteSpace(citizenship))
+        {
+            throw new InvalidCitizenshipException();
+        }
+    }
+
+    // Method to validate flight code format
+    void Validate(string flightCode)
+    {
+        if (string.IsNullOrEmpty(flightCode) || !System.Text.RegularExpressions.Regex.IsMatch(flightCode, @"^[A-Z]{2}-\d{4}$"))
+        {
+            throw new InvalidFlightCodeException();
+        }
+    }
+    // Method to validate the selected flight code
+    void ValidateFlightCode()
+    {
+        if (selectedItem != "")
+        {
+            Validate(selectedItem);
+        }
+    }
+
+    // Method to generate reservation code and manage reservation
+    void Rcode()
+    {
+        errormsg = "";
+        try
+        {
+            ValidateInputs();
+            ValidateFlightCode();
+
+            foreach (var item in findFlights)
+            {
+                if (selectedItem == "")
+                {
+                    throw new NoFlightSelectedException();
+                }
+                else
+                {
+                    if (selectedItem == item.FlightCode && item.Seatsleft > 0)
+                    {
+                        item.Seatsleft -= 1;
+                        reservationCode = ReservationManager.MakeReservation(item, name, citizenship);
+                        FlightManager.UpdateFlight(item);
+                        return;
+                    }
+                    else
+                    {
+                        throw new NoMoreSeatsException();
+                    }
+                }
+
+            }
+        }
+        catch (NoFlightSelectedException e)
+        {
+            errormsg = e.Message;
+        }
+        catch (InvalidNameException e)
+        {
+            errormsg = e.Message;
+        }
+        catch (InvalidCitizenshipException e)
+        {
+            errormsg = e.Message;
+        }
+        catch (InvalidFlightCodeException e)
+        {
+            errormsg = e.Message;
+        }
+        catch (NoMoreSeatsException e)
+        {
+            errormsg = e.Message;
+        }
+
+    }
+}

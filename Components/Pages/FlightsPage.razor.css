@@ -1,0 +1,88 @@
+﻿
+h3{
+    text-align: center
+}
+
+.flex{
+    display: flex;
+    flex-wrap:wrap
+}
+form {
+    align-content: center;
+    margin-top: 30px;
+    margin-bottom: 45px;
+}
+label {
+    display: block;
+    font-weight: bold;
+    text-align: left;
+    padding-left: 7.5px
+}
+
+select {
+    width: 275px;
+    margin-right: 7.5px;
+    margin-left: 7.5px;
+    height: 35px
+}
+input {
+    width: 1130px;
+    margin-right: 7.5px;
+    margin-left: 7.5px;
+}
+
+Button{
+    margin-left: 7.5px;
+    margin-top: 24px;
+    height: 30px;
+    border-radius:2px;
+    width: 275px;
+    background-color: royalblue;
+    color: white;
+    border: none
+}
+
+.flex Button {
+    margin-left: 7.5px;
+    margin-top: 24px;
+    height: 30px;
+    border-radius: 2px;
+    width: 275px;
+    background-color: royalblue;
+    color: white;
+    border: none
+}
+
+.rbutton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction:column;
+}
+.rbutton p{
+    margin-top: 20px;
+    
+}
+
+.flights input{
+    width: 1130px;
+    margin-top: 10px;
+    margin-bottom: 25px;
+    pointer-events: none;
+}
+
+.reserveflights {
+    width: 1130px;
+    margin-right: 7.5px;
+    margin-left: 7.5px;
+    border: solid 1px black;
+    color: grey;
+    padding: 3px
+}
+.reservedflights {
+    width: 1130px;
+    margin-right: 7.5px;
+    margin-left: 7.5px;
+    border: solid 1px black;
+    padding: 3px
+}
